@@ -15,7 +15,7 @@ brew install graphicsmagick
 brew install imagemagick
 ```
 
-Now we can install Wordz.
+Now you can install Wordz.
 
 ```
 npm install -g wordz
@@ -33,7 +33,7 @@ wordz --words hello world --charDir ~/Desktop/font --outDir ~/Desktop
 
 ### --bg
 
-The background color. e.g. `--bg rgb(235,235,220)`
+The background color. e.g. `--bg rgb(235,235,220)`.
 
 Can be any color supported by Graphics Magick.
 
@@ -41,7 +41,8 @@ If omitted background color will not be affected.
 
 ### --charDir
 
-The path to the directory of font character files. e.g. `--charDir ~/Desktop/font`
+The path to the directory of font character files. e.g.
+`--charDir ~/Desktop/font`.
 
 ### --format
 
@@ -59,7 +60,7 @@ If omitted this will assume input character files are `png`.
 
 ### --letterSpacing
 
-The letter spacing in pixels e.g. `--letterSpacing 20`
+The letter spacing in pixels e.g. `--letterSpacing 20`.
 
 Can be any number.
 
@@ -71,7 +72,7 @@ The path to the output directory. e.g. `--outDir ~/Desktop`.
 
 ### --padding
 
-The space around the word. e.g. `--padding 100`
+The space around the word. e.g. `--padding 100`.
 
 Can be a single number that will apply the same padding to each side, or a
 series of 4 space separated numbers that represent top, right, bottom and left
@@ -89,4 +90,4 @@ If omitted characters will not be scaled.
 
 ### --words
 
-A space separated list of words to output. e.g. `--words hello world`
+A space separated list of words to output. e.g. `--words hello world`.
