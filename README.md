@@ -76,7 +76,7 @@ The path to the output directory. e.g. `--outDir ~/Desktop`.
 
 ### --padding
 
-The space around the word. e.g. `--padding 100`.
+The space around the word in pixels. e.g. `--padding 100`.
 
 Can be a single number that will apply the same padding to each side, or a
 series of 4 space separated numbers that represent top, right, bottom and left
