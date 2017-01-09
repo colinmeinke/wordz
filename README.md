@@ -44,6 +44,10 @@ If omitted background color will not be affected.
 The path to the directory of font character files. e.g.
 `--charDir ~/Desktop/font`.
 
+Your character directory will need one file for each letter you use. For
+example, to output the word foo, the character directory needs to include
+the files `f.png` and `o.png`.
+
 ### --format
 
 The output format. e.g. `--format jpg`.
