@@ -40,9 +40,13 @@ const createTmpFile = ({ charPath, options, tmpDir }) => new Promise((resolve, r
 
   console.log(`Attempting to create temporary file ${file}`)
 
-  gm(charPath)
-    .trim()
-    .resize(null, size)
+  const currentImg = gm(charPath).trim()
+
+  if (size && !isNaN(size)) {
+    currentImg.resize(null, parseInt(size, 10))
+  }
+
+  currentImg
     .writeAsync(tmpPath)
     .then(() => {
       console.log(`${file} written to ${tmpDir}`)
@@ -154,7 +158,7 @@ const optionsFromCli = args => {
   const inputFormat = getOptions({ key: 'inputFormat', options }).toString() || 'png'
   const letterSpacing = parseInt(getOptions({ key: 'letterSpacing', options }).toString() || 0, 10)
   const outDir = getOptions({ key: 'outDir', options }).toString()
-  const size = parseInt(getOptions({ key: 'size', options }).toString() || 16, 10)
+  const size = getOptions({ key: 'size', options }).toString()
   const words = getOptions({ key: 'words', options })
 
   if (!charDir) {
