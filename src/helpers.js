@@ -81,7 +81,7 @@ const createWord = ({
     const opts = []
 
     if (letterSpacing) {
-      currentImg.in('-size', `${letterSpacing}x100%`)
+      currentImg.in('-size', `${letterSpacing}x0`)
       currentImg.append('xc:transparent')
     }
 
