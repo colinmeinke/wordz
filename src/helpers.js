@@ -52,6 +52,7 @@ const createTmpFile = ({ charPath, options, tmpDir }) => new Promise((resolve, r
 })
 
 const createWord = ({
+  bg,
   format,
   inputFormat,
   letterSpacing,
@@ -83,8 +84,15 @@ const createWord = ({
     return currentImg.append(path, true)
   }
 
-  tmpCharPaths
+  const currentImg = tmpCharPaths
     .reduce(appendPath, gm(firstTmpCharPath))
+
+  if (bg) {
+    currentImg.out('-background', bg)
+    currentImg.out('-extent', '0x0')
+  }
+
+  currentImg
     .setFormat(format)
     .writeAsync(outPath)
     .then(() => {
@@ -140,6 +148,7 @@ const getOptions = ({ key, options }) => {
 const optionsFromCli = args => {
   const options = args.slice(2)
 
+  const bg = getOptions({ key: 'bg', options }).toString()
   const charDir = getOptions({ key: 'charDir', options }).toString()
   const format = getOptions({ key: 'format', options }).toString() || 'png'
   const inputFormat = getOptions({ key: 'inputFormat', options }).toString() || 'png'
@@ -161,6 +170,7 @@ const optionsFromCli = args => {
   }
 
   return {
+    bg,
     charDir,
     format,
     inputFormat,

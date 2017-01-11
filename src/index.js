@@ -14,6 +14,7 @@ import {
 import Promise from 'bluebird'
 
 const {
+  bg,
   charDir,
   format,
   inputFormat,
@@ -54,6 +55,7 @@ createDir(outDir)
 
     return Promise.all(
       words.map(word => createWord({
+        bg,
         format,
         inputFormat,
         letterSpacing,

@@ -33,7 +33,7 @@ wordz --words hello world --charDir ~/Desktop/font --outDir ~/Desktop
 
 ### --bg
 
-The background color. e.g. `--bg rgb(235,235,220)`.
+The background color. e.g. `--bg "rgb(235,235,220)"`.
 
 Can be any color supported by Graphics Magick.
 
