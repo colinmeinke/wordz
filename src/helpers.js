@@ -89,7 +89,7 @@ const createWord = ({
   }
 
   const currentImg = tmpCharPaths
-    .reduce(appendPath, gm(firstTmpCharPath))
+    .reduce(appendPath, gm(firstTmpCharPath).in('-background', 'transparent'))
 
   if (bg) {
     currentImg.out('-background', bg)
