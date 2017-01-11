@@ -54,6 +54,7 @@ const createTmpFile = ({ charPath, options, tmpDir }) => new Promise((resolve, r
 const createWord = ({
   format,
   inputFormat,
+  letterSpacing,
   outDir,
   tmpPaths,
   word
@@ -71,8 +72,20 @@ const createWord = ({
 
   console.log(`Attempting to create ${word}`)
 
-  gm(firstTmpCharPath)
-    .append(...tmpCharPaths, true)
+  const appendPath = (currentImg, path) => {
+    const opts = []
+
+    if (letterSpacing) {
+      currentImg.in('-size', `${letterSpacing}x100%`)
+      currentImg.append('xc:transparent')
+    }
+
+    return currentImg.append(path, true)
+  }
+
+  tmpCharPaths
+    .reduce(appendPath, gm(firstTmpCharPath))
+    .setFormat(format)
     .writeAsync(outPath)
     .then(() => {
       console.log(`Success! ${word} saved to ${outPath}`)
@@ -130,6 +143,7 @@ const optionsFromCli = args => {
   const charDir = getOptions({ key: 'charDir', options }).toString()
   const format = getOptions({ key: 'format', options }).toString() || 'png'
   const inputFormat = getOptions({ key: 'inputFormat', options }).toString() || 'png'
+  const letterSpacing = parseInt(getOptions({ key: 'letterSpacing', options }).toString() || 0, 10)
   const outDir = getOptions({ key: 'outDir', options }).toString()
   const size = parseInt(getOptions({ key: 'size', options }).toString() || 16, 10)
   const words = getOptions({ key: 'words', options })
@@ -150,6 +164,7 @@ const optionsFromCli = args => {
     charDir,
     format,
     inputFormat,
+    letterSpacing,
     outDir,
     size,
     words

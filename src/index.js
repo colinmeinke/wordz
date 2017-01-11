@@ -17,6 +17,7 @@ const {
   charDir,
   format,
   inputFormat,
+  letterSpacing,
   outDir,
   size,
   words
@@ -55,6 +56,7 @@ createDir(outDir)
       words.map(word => createWord({
         format,
         inputFormat,
+        letterSpacing,
         outDir,
         tmpPaths,
         word
