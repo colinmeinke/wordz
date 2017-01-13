@@ -19,6 +19,7 @@ const {
   format,
   inputFormat,
   letterSpacing,
+  padding,
   outDir,
   size,
   words
@@ -60,6 +61,7 @@ createDir(outDir)
         inputFormat,
         letterSpacing,
         outDir,
+        padding,
         tmpPaths,
         word
       }))

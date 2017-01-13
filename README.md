@@ -66,7 +66,7 @@ If omitted this will assume input character files are `png`.
 
 The letter spacing in pixels e.g. `--letterSpacing 20`.
 
-Can be any positive number.
+Can be any number.
 
 If omitted there will be no letter spacing.
 

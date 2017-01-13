@@ -7,6 +7,39 @@ import Promise from 'bluebird'
 Promise.promisifyAll(fs)
 Promise.promisifyAll(gm.prototype)
 
+const calculateDimensions = ({ letterSpacing, padding, paths }) => new Promise((resolve, reject) => {
+  Promise.reduce(paths, ({ height, pathDimensions, width }, path, i) => (
+    new Promise((resolve, reject) => {
+      gm(path)
+        .sizeAsync()
+        .then(size => {
+          height = Math.max(height, size.height + padding[ 0 ] + padding[ 2 ])
+          width += i ? letterSpacing : padding[ 3 ]
+
+          const x = width
+          const y = padding[ 0 ]
+
+          width += size.width
+
+          if (i === paths.length - 1) {
+            width += padding[ 1 ]
+          }
+
+          resolve({
+            height,
+            pathDimensions: [
+              ...pathDimensions,
+              { height: size.height, width: size.width, x, y }
+            ],
+            width
+          })
+        })
+    }
+  )), { height: 0, pathDimensions: [], width: 0 })
+    .then(resolve)
+    .catch(reject)
+})
+
 const createDir = dir => new Promise((resolve, reject) => {
   pathExists(dir)
     .then(resolve)
@@ -38,7 +71,7 @@ const createTmpFile = ({ charPath, options, tmpDir }) => new Promise((resolve, r
   const file = fileFromPath(charPath)
   const tmpPath = p.join(tmpDir, file)
 
-  console.log(`Attempting to create temporary file ${file}`)
+  console.log(`Creating temporary file ${file}`)
 
   const currentImg = gm(charPath).trim()
 
@@ -61,6 +94,7 @@ const createWord = ({
   inputFormat,
   letterSpacing,
   outDir,
+  padding,
   tmpPaths,
   word
 }) => new Promise((resolve, reject) => {
@@ -72,36 +106,32 @@ const createWord = ({
     paths: tmpPaths
   }))
 
-  const firstTmpCharPath = tmpCharPaths.shift()
-  const outPath = p.join(outDir, `${word}.${format}`)
+  console.log(`Calculating ${word} dimensions`)
 
-  console.log(`Attempting to create ${word}`)
+  calculateDimensions({ letterSpacing, padding, paths: tmpCharPaths })
+    .then(({ height, pathDimensions, width }) => {
+      console.log(`Creating ${word}`)
 
-  const appendPath = (currentImg, path) => {
-    const opts = []
+      const outPath = p.join(outDir, `${word}.${format}`)
+      const state = gm(width, height, bg || 'transparent')
 
-    if (letterSpacing) {
-      currentImg.in('-size', `${letterSpacing}x0`)
-      currentImg.append('xc:transparent')
-    }
+      tmpCharPaths.map((path, i) => {
+        const { height: pathHeight, width: pathWidth, x, y } = pathDimensions[ i ]
 
-    return currentImg.append(path, true)
-  }
+        state
+          .in('-resize', `${pathWidth}x${pathHeight}!`)
+          .in('-page', `+${x}+${y}`)
+          .in(path)
+      })
 
-  const currentImg = tmpCharPaths
-    .reduce(appendPath, gm(firstTmpCharPath).in('-background', 'transparent'))
-
-  if (bg) {
-    currentImg.out('-background', bg)
-    currentImg.out('-extent', '0x0')
-  }
-
-  currentImg
-    .setFormat(format)
-    .writeAsync(outPath)
-    .then(() => {
-      console.log(`Success! ${word} saved to ${outPath}`)
-      resolve(word)
+      state
+        .mosaic()
+        .setFormat(format)
+        .writeAsync(outPath)
+        .then(() => {
+          console.log(`Success! ${word} saved to ${outPath}`)
+          resolve(word)
+        })
     })
     .catch(reject)
 })
@@ -149,6 +179,28 @@ const getOptions = ({ key, options }) => {
   return []
 }
 
+const getPadding = values => {
+  const padding = values.map(v => parseInt(v, 10))
+
+  if (!padding.length) {
+    return [ 0, 0, 0, 0 ]
+  }
+
+  if (typeof padding[ 1 ] === 'undefined') {
+    padding[ 1 ] = padding[ 0 ]
+  }
+
+  if (typeof padding[ 2 ] === 'undefined') {
+    padding[ 2 ] = padding[ 0 ]
+  }
+
+  if (typeof padding[ 3 ] === 'undefined') {
+    padding[ 3 ] = padding[ 1 ]
+  }
+
+  return padding
+}
+
 const optionsFromCli = args => {
   const options = args.slice(2)
 
@@ -158,6 +210,7 @@ const optionsFromCli = args => {
   const inputFormat = getOptions({ key: 'inputFormat', options }).toString() || 'png'
   const letterSpacing = parseInt(getOptions({ key: 'letterSpacing', options }).toString() || 0, 10)
   const outDir = getOptions({ key: 'outDir', options }).toString()
+  const padding = getPadding(getOptions({ key: 'padding', options }))
   const size = getOptions({ key: 'size', options }).toString()
   const words = getOptions({ key: 'words', options })
 
@@ -180,6 +233,7 @@ const optionsFromCli = args => {
     inputFormat,
     letterSpacing,
     outDir,
+    padding,
     size,
     words
   }
