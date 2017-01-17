@@ -73,17 +73,28 @@ const createTmpFile = ({ charPath, options, tmpDir }) => new Promise((resolve, r
 
   console.log(`Creating temporary file ${file}`)
 
-  const currentImg = gm(charPath).trim()
+  gm(charPath)
+    .identifyAsync('%h')
+    .then(height => {
+      gm(charPath)
+        .in('-format', '%@')
+        .writeAsync('info:-')
+        .then(result => {
+          const [ width, , x ] = result.split(/[\+x]+/)
 
-  if (size && !isNaN(size)) {
-    currentImg.resize(null, parseInt(size, 10))
-  }
+          const state = gm(charPath).crop(width, height, x, 0)
 
-  currentImg
-    .writeAsync(tmpPath)
-    .then(() => {
-      console.log(`${file} written to ${tmpDir}`)
-      resolve(tmpPath)
+          if (size && !isNaN(size)) {
+            state.resize(null, parseInt(size, 10))
+          }
+
+          state
+            .writeAsync(tmpPath)
+            .then(() => {
+              console.log(`${file} written to ${tmpDir}`)
+              resolve(tmpPath)
+            })
+        })
     })
     .catch(reject)
 })
