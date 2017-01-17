@@ -25,11 +25,11 @@
     "gm": "^1.23.0"
   },
   "devDependencies": {
-    "commitizen": "^2.9.3",
+    "commitizen": "^2.9.5",
     "cz-conventional-changelog": "^1.2.0",
     "rimraf": "^2.5.4",
     "semantic-release": "^6.3.2",
-    "snazzy": "^5.0.0",
+    "snazzy": "^6.0.0",
     "standard": "^8.6.0"
   },
   "babel": {
