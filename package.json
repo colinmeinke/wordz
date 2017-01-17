@@ -52,7 +52,8 @@
     "fix": "standard --fix",
     "lint": "standard --verbose | snazzy",
     "prepublish": "npm run tidy && npm run build",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "tidy": "rimraf bin"
   },
-  "version": "0.0.0-semantically-released"
+  "version": "0.0.0-development"
 }
