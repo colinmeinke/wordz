@@ -80,7 +80,7 @@ const createTmpFile = ({ charPath, options, tmpDir }) => new Promise((resolve, r
         .in('-format', '%@')
         .writeAsync('info:-')
         .then(result => {
-          const [ width, , x ] = result.split(/[\+x]+/)
+          const [ width, , x ] = result.split(/[+x]+/)
 
           const state = gm(charPath).crop(width, height, x, 0)
 
