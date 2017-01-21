@@ -273,12 +273,10 @@ const processQueue = ({ concurrency, func, queue }) => new Promise((resolve, rej
     const item = q.shift()
 
     awaiting++
-    capacity--
 
     func(item)
       .then(r => {
         awaiting--
-        capacity++
 
         result.push(r)
 
@@ -288,7 +286,7 @@ const processQueue = ({ concurrency, func, queue }) => new Promise((resolve, rej
   }
 
   const next = () => {
-    if (q.length && capacity) {
+    if (q.length) {
       processNextItem()
     } else if (!awaiting) {
       resolve(result)
@@ -297,6 +295,7 @@ const processQueue = ({ concurrency, func, queue }) => new Promise((resolve, rej
 
   while (capacity) {
     next()
+    capacity--
   }
 })
 
