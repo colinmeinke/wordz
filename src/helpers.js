@@ -217,6 +217,7 @@ const optionsFromCli = args => {
 
   const bg = getOptions({ key: 'bg', options }).toString()
   const charDir = getOptions({ key: 'charDir', options }).toString()
+  const concurrency = parseInt(getOptions({ key: 'concurrency', options }).toString() || 5, 10)
   const format = getOptions({ key: 'format', options }).toString() || 'png'
   const inputFormat = getOptions({ key: 'inputFormat', options }).toString() || 'png'
   const letterSpacing = parseInt(getOptions({ key: 'letterSpacing', options }).toString() || 0, 10)
@@ -240,6 +241,7 @@ const optionsFromCli = args => {
   return {
     bg,
     charDir,
+    concurrency,
     format,
     inputFormat,
     letterSpacing,
@@ -260,6 +262,44 @@ const pathsFromChars = ({ chars, dir, ext }) => chars.map(char => (
   p.join(dir, `${char}.${ext}`)
 ))
 
+const processQueue = ({ concurrency, func, queue }) => new Promise((resolve, reject) => {
+  let awaiting = 0
+  let capacity = concurrency
+
+  const q = [ ...queue ]
+  const result = []
+
+  const processNextItem = () => {
+    const item = q.shift()
+
+    awaiting++
+    capacity--
+
+    func(item)
+      .then(r => {
+        awaiting--
+        capacity++
+
+        result.push(r)
+
+        next()
+      })
+      .catch(reject)
+  }
+
+  const next = () => {
+    if (q.length && capacity) {
+      processNextItem()
+    } else if (!awaiting) {
+      resolve(result)
+    }
+  }
+
+  while (capacity) {
+    next()
+  }
+})
+
 export {
   createDir,
   createTmpDir,
@@ -271,5 +311,6 @@ export {
   getOptions,
   optionsFromCli,
   pathExists,
-  pathsFromChars
+  pathsFromChars,
+  processQueue
 }

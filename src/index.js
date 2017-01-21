@@ -8,7 +8,8 @@ import {
   deleteDir,
   optionsFromCli,
   pathExists,
-  pathsFromChars
+  pathsFromChars,
+  processQueue
 } from './helpers'
 
 import Promise from 'bluebird'
@@ -16,6 +17,7 @@ import Promise from 'bluebird'
 const {
   bg,
   charDir,
+  concurrency,
   format,
   inputFormat,
   letterSpacing,
@@ -41,31 +43,32 @@ createDir(outDir)
       .then(() => ({ charPaths, tmpDir }))
   })
   // Create temporary files
-  .then(({ charPaths, tmpDir }) => (
-    Promise.all(
-      charPaths.map(charPath => createTmpFile({
-        charPath,
-        options: { size },
-        tmpDir
-      }))
-    )
-      .then(tmpPaths => ({ tmpDir, tmpPaths }))
-  ))
-  .then(({ tmpDir, tmpPaths }) => {
-    console.log('All temporary files created')
+  .then(({ charPaths, tmpDir }) => {
+    const func = charPath => createTmpFile({
+      charPath,
+      options: { size },
+      tmpDir
+    })
 
-    return Promise.all(
-      words.map(word => createWord({
-        bg,
-        format,
-        inputFormat,
-        letterSpacing,
-        outDir,
-        padding,
-        tmpPaths,
-        word
-      }))
-    )
+    return processQueue({ concurrency, func, queue: charPaths })
+      .then(tmpPaths => {
+        console.log('All temporary files created')
+        return { tmpDir, tmpPaths }
+      })
+  })
+  .then(({ tmpDir, tmpPaths }) => {
+    const func = word => createWord({
+      bg,
+      format,
+      inputFormat,
+      letterSpacing,
+      outDir,
+      padding,
+      tmpPaths,
+      word
+    })
+
+    return processQueue({ concurrency, func, queue: words })
       .then(() => tmpDir)
   })
   .then(tmpDir => {

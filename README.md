@@ -48,6 +48,15 @@ Your character directory will need one file for each letter you use. For
 example, to output the word `foo`, the character directory needs to include
 the files `f.png` and `o.png`.
 
+### --concurrency
+
+The maximum number of images written concurrently.
+e.g. `--concurrency 20`.
+
+Additional writes will be queued.
+
+If omitted this will default to 5.
+
 ### --format
 
 The output format. e.g. `--format jpg`.
